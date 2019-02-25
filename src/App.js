@@ -83,6 +83,7 @@ class Quiz extends Component {
     this.handleName = this.handleName.bind(this);
     this.handleClass = this.handleClass.bind(this);
     this.submitQuiz = this.submitQuiz.bind(this);
+    this.deleteQuiz = this.deleteQuiz.bind(this);
   }
 
   handleName(e){
@@ -103,6 +104,14 @@ class Quiz extends Component {
       class: ''
     });
   }
+  deleteQuiz(e){
+    let id = e.target.parentNode.id.replace('quiz_', '');
+    let arr = this.state.quizzes;
+    arr = [...arr.slice(0, id), ...arr.slice(id+1)];
+    this.setState({
+      quizzes: arr
+    })
+  }
 
   render(){
     
@@ -121,7 +130,8 @@ class Quiz extends Component {
         <ul>
           {
             this.state.quizzes.map((quiz, idx) => {
-              return <li key={idx}>Quiz ID: {idx} Quiz Name: {quiz.name} Quiz Class: {quiz.class} <Question quizId={idx}/></li>
+              let quiz_id = 'quiz_'+idx;
+              return <li key={idx} id={quiz_id}>Quiz ID: {idx} Quiz Name: {quiz.name} Quiz Class: {quiz.class} <button onClick={this.deleteQuiz}>Delete</button> <Question quizId={idx}/></li>
             })
           }
         </ul>
