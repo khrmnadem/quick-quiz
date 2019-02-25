@@ -40,7 +40,7 @@ class Question extends Component {
     // console.log(e.target.parentNode.id); we have index question_indexnumber
     let id = e.target.parentNode.id.replace('question_', '');
     let arr = this.state.questions;
-    arr = [...arr.slice(0, id), ...arr.slice(id+1)]
+    arr.splice(id, 1); //remove 1 element from id means remove element which has id id
     this.setState({
       questions: arr
     });
@@ -53,11 +53,11 @@ class Question extends Component {
           {
             this.state.questions.map((question,idx)=>{
               let question_id = 'question_'+idx;
-              return <li key={idx} id={question_id}>Question: {question.question} Answer: {question.answer} <button onClick={this.deleteQuestion}>Delete</button></li>
+              return <li key={idx} id={question_id}> <b>Question:</b> {question.question} <b>Answer:</b> {question.answer} <button onClick={this.deleteQuestion}>Delete Question</button></li>
             })
           }
         </ul>
-        <h4>Create Questions</h4>
+        <h3>Create Questions</h3>
         <label htmlFor="question">Question: </label>
         <input id="question" value={this.state.question} type="text" onChange={this.handleQuestion}/>
         <br />
@@ -107,18 +107,18 @@ class Quiz extends Component {
   deleteQuiz(e){
     let id = e.target.parentNode.id.replace('quiz_', '');
     let arr = this.state.quizzes;
-    arr = [...arr.slice(0, id), ...arr.slice(id+1)];
+    arr.splice(id, 1); //remove 1 element from id means remove element which has id id
     this.setState({
       quizzes: arr
-    })
+    });
   }
 
   render(){
     
     return (
       <div>
-        <h3>Quiz Component</h3>
-        <h4>Create New Quiz</h4>
+        <h2>Quiz Component</h2>
+        <h3>Create New Quiz</h3>
         
         <label htmlFor="quizName">Quiz Name: </label>        
         <input id="quizName" value={this.state.name} type="text" onChange={this.handleName}/>
@@ -131,7 +131,7 @@ class Quiz extends Component {
           {
             this.state.quizzes.map((quiz, idx) => {
               let quiz_id = 'quiz_'+idx;
-              return <li key={idx} id={quiz_id}>Quiz ID: {idx} Quiz Name: {quiz.name} Quiz Class: {quiz.class} <button onClick={this.deleteQuiz}>Delete</button> <Question quizId={idx}/></li>
+              return <li key={idx} id={quiz_id}><b>Quiz ID:</b> {idx} <b>Quiz Name:</b> {quiz.name} <b>Quiz Class:</b> {quiz.class} <button onClick={this.deleteQuiz}>Delete Quiz</button> <Question quizId={idx}/></li>
             })
           }
         </ul>
