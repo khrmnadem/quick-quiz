@@ -9,11 +9,11 @@ class Question extends Component {
       answer: '',
       questions: []
     }
-
     
     this.handleAnswer = this.handleAnswer.bind(this);
     this.handleQuestion = this.handleQuestion.bind(this);
     this.submitQuestion = this.submitQuestion.bind(this);
+    this.deleteQuestion = this.deleteQuestion.bind(this);
   }
 
   
@@ -29,23 +29,40 @@ class Question extends Component {
   }
   submitQuestion(){
     let arr = this.state.questions;
-    arr = [...this.state.questions, {quiz_id: this.props.quizid, question: this.state.question, answer: this.state.answer}];
+    arr = [...this.state.questions, {quiz_id: this.props.quizId, question: this.state.question, answer: this.state.answer}];
     this.setState({
       question: '',
       answer: '',
       questions: arr
     })
   }
+  deleteQuestion(e){
+    // console.log(e.target.parentNode.id); we have index question_indexnumber
+    let id = e.target.parentNode.id.replace('question_', '');
+    let arr = this.state.questions;
+    arr = [...arr.slice(0, id), ...arr.slice(id+1)]
+    this.setState({
+      questions: arr
+    });
+  }
 
   render(){
     return (
       <div>
+        <ul>
+          {
+            this.state.questions.map((question,idx)=>{
+              let question_id = 'question_'+idx;
+              return <li key={idx} id={question_id}>Question: {question.question} Answer: {question.answer} <button onClick={this.deleteQuestion}>Delete</button></li>
+            })
+          }
+        </ul>
         <h4>Create Questions</h4>
-        <label for="question">Question: </label>
-        <input id="question" type="text" onChange={this.handleQuestion}/>
+        <label htmlFor="question">Question: </label>
+        <input id="question" value={this.state.question} type="text" onChange={this.handleQuestion}/>
         <br />
-        <label for="answer">Answer: </label>
-        <input id="answer" type="text" onChange={this.handleAnswer}/>
+        <label htmlFor="answer">Answer: </label>
+        <input id="answer" value={this.state.answer} type="text" onChange={this.handleAnswer}/>
         <br />
         <button onClick={this.submitQuestion}>Add Question</button>
       </div>
@@ -58,7 +75,6 @@ class Quiz extends Component {
     super(props);
 
     this.state = {
-      id: null,
       name: '',
       class: '',
       quizzes: []      
@@ -80,9 +96,11 @@ class Quiz extends Component {
     });
   }
   submitQuiz(){
-    let arr = [...this.state.quizzes, {id: this.state.quizzes.length, name:this.state.name, class: this.state.class}];
+    let arr = [...this.state.quizzes, {name:this.state.name, class: this.state.class}];
     this.setState({
-      quizzes: arr
+      quizzes: arr,
+      name: '', //for input clear
+      class: ''
     });
   }
 
@@ -93,17 +111,17 @@ class Quiz extends Component {
         <h3>Quiz Component</h3>
         <h4>Create New Quiz</h4>
         
-        <label for="quizName">Quiz Name: </label>        
-        <input id="quizName" type="text" onChange={this.handleName}/>
+        <label htmlFor="quizName">Quiz Name: </label>        
+        <input id="quizName" value={this.state.name} type="text" onChange={this.handleName}/>
         <br />
-        <label for="quizClass">Quiz Class: </label>        
-        <input id="quizClass" type="text" onChange={this.handleClass}/>
+        <label htmlFor="quizClass">Quiz Class: </label>        
+        <input id="quizClass" value={this.state.class} type="text" onChange={this.handleClass}/>
         <br />
         <button onClick={this.submitQuiz}>Create Quiz</button>
         <ul>
           {
-            this.state.quizzes.map(quiz => {
-              return <li>Quiz ID: {quiz.id} Quiz Name: {quiz.name} Quiz Class: {quiz.class} Question: <Question quizid={quiz.id}/></li>
+            this.state.quizzes.map((quiz, idx) => {
+              return <li key={idx}>Quiz ID: {idx} Quiz Name: {quiz.name} Quiz Class: {quiz.class} <Question quizId={idx}/></li>
             })
           }
         </ul>
