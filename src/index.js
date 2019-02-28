@@ -121,7 +121,7 @@ class Question extends React.Component{
         <ul>
           {
             this.props.questions.map((question)=>{
-              return (<li>{question.question} - {question.answer}</li>)
+              return (<li>Quiz Index: {this.props.quizIndex} - {question.question} - {question.answer}</li>)
             })
           }
         </ul>
@@ -181,7 +181,7 @@ class Quiz extends React.Component{
             this.props.quizzes.map((quiz, idx)=>{
             return (<li key={idx}>{quiz.name} - {quiz.class} - index: {idx}
             <br />
-            <Question questions={this.props.questions} addQuestion={this.props.addQuestion} />
+            <ConnectedQuestion quizIndex={idx}/>
             </li>)
             })
           }
@@ -198,7 +198,7 @@ class Quiz extends React.Component{
 class App extends React.Component{
   render(){
     return(
-        <Container />
+        <ConnectedQuiz />
     )
   }
 }
@@ -222,7 +222,9 @@ const mapDispatchToProps = (dispatch)=>{
 }
 
 //connect Quiz component to store
-const Container = connect(mapStateToProps, mapDispatchToProps)(Quiz);
+const ConnectedQuiz = connect(mapStateToProps, mapDispatchToProps)(Quiz);
+//connect Question component to store
+const ConnectedQuestion = connect(mapStateToProps, mapDispatchToProps)(Question);
 
 //react-dom
 //wrap all App with Provider component for store accessibility
