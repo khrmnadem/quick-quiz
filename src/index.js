@@ -76,6 +76,7 @@ class Question extends React.Component{
     super(props);
 
     this.state = {
+      quiz_id: null,
       question: '',
       answer: ''
     }
@@ -88,7 +89,8 @@ class Question extends React.Component{
   submitQuestion(){
     this.props.addQuestion({
       question: this.state.question,
-      answer: this.state.answer
+      answer: this.state.answer,
+      quiz_id: this.props.quizIndex
     });
 
     this.setState({
@@ -120,8 +122,8 @@ class Question extends React.Component{
         <button onClick={this.submitQuestion}>Create Question</button>
         <ul>
           {
-            this.props.questions.map((question)=>{
-              return (<li>Quiz Index: {this.props.quizIndex} - {question.question} - {question.answer}</li>)
+            this.props.questions.filter(question => question.quiz_id === this.props.quizIndex).map((question, idx)=>{
+                return (<li key={idx}>{question.question} - {question.answer}</li>)
             })
           }
         </ul>
@@ -136,7 +138,8 @@ class Quiz extends React.Component{
     super(props);
 
     this.state = {
-      name: ''
+      name: '',
+      class: ''
     }
 
     this.nameChange = this.nameChange.bind(this);
@@ -179,9 +182,10 @@ class Quiz extends React.Component{
         <ul>
           {
             this.props.quizzes.map((quiz, idx)=>{
-            return (<li key={idx}>{quiz.name} - {quiz.class} - index: {idx}
+            let id = 'quiz_'+idx;
+            return (<li key={idx} id={id}>{quiz.name} - {quiz.class} - index: {idx}
             <br />
-            <ConnectedQuestion quizIndex={idx}/>
+            <ConnectedQuestion quizIndex={idx} />
             </li>)
             })
           }
