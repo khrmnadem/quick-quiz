@@ -7,6 +7,8 @@ import { createStore } from 'redux';
 //action types
 const CREATE_QUIZ = 'CREATE_QUIZ';
 const CREATE_QUESTION = 'CREATE_QUESTION';
+const REMOVE_QUESTION = 'REMOVE_QUESTION';
+const REMOVE_QUIZ= 'REMOVE_QUIZ';
 
 //state has quizzes array and questions array
 const initialState = {
@@ -29,6 +31,13 @@ const createQuestion = (question)=>{
   }
 }
 
+const removeQuestion = (id)=>{
+  return {
+    type: REMOVE_QUESTION,
+    payload: id
+  }
+}
+
 //reducer for teacher actions
 const teacherReducer = (state = initialState, action)=>{
   let updatedQuizzes = state.quizzes;
@@ -43,6 +52,13 @@ const teacherReducer = (state = initialState, action)=>{
       break;
     case CREATE_QUESTION:
       updatedQuestions.push(action.payload);
+      return {
+        ...state,
+        questions: updatedQuestions
+      }
+      break;
+    case REMOVE_QUESTION:
+      updatedQuestions = updatedQuestions.filter(question=>question.id !== action.payload);
       return {
         ...state,
         questions: updatedQuestions
@@ -84,10 +100,12 @@ class Question extends React.Component{
     this.submitQuestion = this.submitQuestion.bind(this);
     this.answerChange = this.answerChange.bind(this);
     this.questionChange = this.questionChange.bind(this);
+    this.removeQuestion = this.removeQuestion.bind(this);
   }
 
   submitQuestion(){
     this.props.addQuestion({
+      id: this.props.questions.length,
       question: this.state.question,
       answer: this.state.answer,
       quiz_id: this.props.quizIndex
@@ -97,6 +115,13 @@ class Question extends React.Component{
       ...this.state,
       question: '',
       answer: ''
+    })
+  }
+
+  removeQuestion(id){
+    this.props.removeQuestion(id);
+    this.setState({
+      ...this.state
     })
   }
   
@@ -123,7 +148,10 @@ class Question extends React.Component{
         <ul>
           {
             this.props.questions.filter(question => question.quiz_id === this.props.quizIndex).map((question, idx)=>{
-                return (<li key={idx}>{question.question} - {question.answer}</li>)
+                let index = 'question_'+idx;
+                return (<li key={idx}>{question.question} - {question.answer}
+                <button onClick={()=>this.removeQuestion(question.id)}>Remove Question</button>
+                </li>)
             })
           }
         </ul>
@@ -221,6 +249,9 @@ const mapDispatchToProps = (dispatch)=>{
     },
     addQuestion: (question) => {
       dispatch(createQuestion(question))
+    },
+    removeQuestion: (id) => {
+      dispatch(removeQuestion(id))
     }
   }
 }
