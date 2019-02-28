@@ -3,12 +3,15 @@ import React from 'react';
 import {Provider, connect} from 'react-redux';
 import { createStore } from 'redux';
 
+//redux
+//action types
 const CREATE_QUIZ = 'CREATE_QUIZ';
 
 const initialState = {
   quizzes: []
 };
 
+//action creators
 const createQuiz = (quiz)=>{
   return {
     type: CREATE_QUIZ,
@@ -16,6 +19,7 @@ const createQuiz = (quiz)=>{
   }
 }
 
+//reducer for teacher actions
 const teacherReducer = (state = initialState, action)=>{
   let arr = state.quizzes;
   switch(action.type){
@@ -30,15 +34,16 @@ const teacherReducer = (state = initialState, action)=>{
   }
 }
 
-
+//store for state
 const store = createStore(teacherReducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
+//for test
 store.dispatch(createQuiz({name: 'quiz1', class:'math'}));
 store.dispatch(createQuiz({name: 'quiz2', class:'math'}));
 store.dispatch(createQuiz({name: 'quiz3', class:'math'}));
-
 console.log(store.getState());
 
+//react
 class Quiz extends React.Component{
 
   constructor(props){
@@ -97,7 +102,7 @@ class Quiz extends React.Component{
   }
 }
 
-
+//react-redux
 const mapStateToProps = (state)=>{
   return {
     quizzes: state
@@ -112,10 +117,11 @@ const mapDispatchToProps = (dispatch)=>{
   }
 }
 
+//connect Quiz component to store
 const Container = connect(mapStateToProps, mapDispatchToProps)(Quiz);
 
+//use Container component in App component
 class App extends React.Component{
-
   render(){
     return(
         <Container />
@@ -124,6 +130,7 @@ class App extends React.Component{
 }
 
 //react-dom
+//wrap all App with Provider component for store accessibility
 ReactDOM.render(
 <Provider store={store}>
   <App />
