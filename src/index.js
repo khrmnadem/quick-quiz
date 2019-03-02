@@ -38,6 +38,13 @@ const removeQuestion = (id)=>{
   }
 }
 
+const removeQuiz = (id) =>{
+  return {
+    type: REMOVE_QUIZ,
+    payload: id
+  }
+}
+
 //reducer for teacher actions
 const teacherReducer = (state = initialState, action)=>{
   let updatedQuizzes = state.quizzes;
@@ -62,6 +69,13 @@ const teacherReducer = (state = initialState, action)=>{
       return {
         ...state,
         questions: updatedQuestions
+      }
+      break;
+    case REMOVE_QUIZ:
+      updatedQuizzes.splice(action.payload, 1);
+      return {
+        ...state,
+        quizzes: updatedQuizzes
       }
       break;
     default:
@@ -92,6 +106,7 @@ class Question extends React.Component{
     super(props);
 
     this.state = {
+      id: null,
       quiz_id: null,
       question: '',
       answer: ''
@@ -166,6 +181,7 @@ class Quiz extends React.Component{
     super(props);
 
     this.state = {
+      id: null,
       name: '',
       class: ''
     }
@@ -173,6 +189,7 @@ class Quiz extends React.Component{
     this.nameChange = this.nameChange.bind(this);
     this.classChange = this.classChange.bind(this);
     this.submitQuiz = this.submitQuiz.bind(this);
+    this.removeQuiz = this.removeQuiz.bind(this);
   }
 
   nameChange(e){
@@ -191,6 +208,7 @@ class Quiz extends React.Component{
 
   submitQuiz(){
     this.props.addQuiz({
+      id: this.props.quizzes.length,
       name:this.state.name,
       class:this.state.class
     });
@@ -198,6 +216,17 @@ class Quiz extends React.Component{
       ...this.state,
       name: '',
       class: ''
+    })
+  }
+
+  removeQuiz(id){
+    this.props.removeQuiz(id);
+    //remove questions that have removen quiz's id
+    this.props.questions.filter(question=>question.quiz_id == id).map(question=>{
+      this.props.removeQuestion(question.id);
+    })
+    this.setState({
+      ...this.state
     })
   }
 
@@ -212,8 +241,11 @@ class Quiz extends React.Component{
             this.props.quizzes.map((quiz, idx)=>{
             let id = 'quiz_'+idx;
             return (<li key={idx} id={id}>{quiz.name} - {quiz.class} - index: {idx}
+            <button onClick={()=>this.removeQuiz(idx)}>
+              Remove Quiz
+            </button>
             <br />
-            <ConnectedQuestion quizIndex={idx} />
+            <ConnectedQuestion quizIndex={quiz.id} />
             </li>)
             })
           }
@@ -252,6 +284,9 @@ const mapDispatchToProps = (dispatch)=>{
     },
     removeQuestion: (id) => {
       dispatch(removeQuestion(id))
+    },
+    removeQuiz: (id) => {
+      dispatch(removeQuiz(id))
     }
   }
 }
