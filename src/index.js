@@ -72,7 +72,7 @@ const teacherReducer = (state = initialState, action)=>{
       }
       break;
     case REMOVE_QUIZ:
-      updatedQuizzes.splice(action.payload, 1);
+      updatedQuizzes = updatedQuizzes.filter(quiz=>quiz.id !== action.payload);
       return {
         ...state,
         quizzes: updatedQuizzes
@@ -224,7 +224,8 @@ class Quiz extends React.Component{
     //remove questions that have removen quiz's id
     this.props.questions.filter(question=>question.quiz_id == id).map(question=>{
       this.props.removeQuestion(question.id);
-    })
+    });
+    
     this.setState({
       ...this.state
     })
@@ -239,9 +240,8 @@ class Quiz extends React.Component{
         <ul>
           {
             this.props.quizzes.map((quiz, idx)=>{
-            let id = 'quiz_'+idx;
-            return (<li key={idx} id={id}>{quiz.name} - {quiz.class} - index: {idx}
-            <button onClick={()=>this.removeQuiz(idx)}>
+            return (<li key={idx}>{quiz.name} - {quiz.class} - index: {quiz.id}
+            <button onClick={()=>this.removeQuiz(quiz.id)}>
               Remove Quiz
             </button>
             <br />
