@@ -9,11 +9,15 @@ const CREATE_QUIZ = 'CREATE_QUIZ';
 const CREATE_QUESTION = 'CREATE_QUESTION';
 const REMOVE_QUESTION = 'REMOVE_QUESTION';
 const REMOVE_QUIZ= 'REMOVE_QUIZ';
+const SHOW_QUIZZES= 'SHOW_QUIZZES';
+const SELECT_QUIZ= 'SELECT_QUIZ';
+
 
 //state has quizzes array and questions array
 const initialState = {
   quizzes: [],
-  questions: []
+  questions: [],
+  selectedQuiz: {}
 };
 
 //action creators
@@ -41,6 +45,19 @@ const removeQuestion = (id)=>{
 const removeQuiz = (id) =>{
   return {
     type: REMOVE_QUIZ,
+    payload: id
+  }
+}
+
+const showQuizzes = () => {
+  return {
+    type: SHOW_QUIZZES
+  }
+}
+
+const selectQuiz = (id) => {
+  return {
+    type: SELECT_QUIZ,
     payload: id
   }
 }
@@ -76,6 +93,18 @@ const teacherReducer = (state = initialState, action)=>{
       return {
         ...state,
         quizzes: updatedQuizzes
+      }
+      break;
+    case SHOW_QUIZZES:
+      return {
+        ...state,
+        quizzes: updatedQuizzes
+      }
+      break;
+    case SELECT_QUIZ:
+      return {
+        ...state,
+        selectedQuiz: updatedQuizzes.find(quiz=>quiz.id == action.payload)
       }
       break;
     default:
@@ -255,6 +284,61 @@ class Quiz extends React.Component{
   }
 }
 
+class Student extends React.Component{
+  constructor(props){
+    super(props);
+
+    this.state = {
+      selectedQuiz: null
+    }
+
+    this.showQuizzes = this.showQuizzes.bind(this);
+    this.selectQuiz = this.selectQuiz.bind(this);
+  }
+
+  showQuizzes(){
+    this.setState({
+      ...this.state
+    })
+  }
+
+  selectQuiz(e){
+    // console.log(e.target.value); //value of option
+    this.props.selectQuiz(e.target.value); //This selectQuiz is action creator in redux
+    
+    this.setState({
+      ...this.state
+    })
+  }
+
+  render(){
+    
+    return (
+      <div>
+        <hr />
+        <h2>Taking Quiz</h2>
+        <h3>Select Quiz:</h3>
+        <select onFocus={this.showQuizzes} onChange={this.selectQuiz}>
+        <option>Select quiz</option>
+        {
+          this.props.quizzes.map(quiz=>{
+            return (<option value={quiz.id}>{quiz.name}</option>)
+          })
+        }
+        </select>
+        <hr />
+        <h3>{this.props.selectedQuiz.name}</h3>
+        <ul>
+          {
+            this.props.questions.filter(question=>question.quiz_id===this.props.selectedQuiz.id).map(question=><li>{question.question}</li>)
+          }
+        </ul>
+      </div>
+    );
+
+  }
+}
+
 //react-redux
 
 
@@ -262,7 +346,10 @@ class Quiz extends React.Component{
 class App extends React.Component{
   render(){
     return(
-        <ConnectedQuiz />
+    <div>
+      <ConnectedQuiz />
+      <ConnectedStudent />
+    </div>
     )
   }
 }
@@ -270,7 +357,8 @@ class App extends React.Component{
 const mapStateToProps = (state)=>{
   return {
     quizzes: state.quizzes,
-    questions: state.questions
+    questions: state.questions,
+    selectedQuiz: state.selectedQuiz
   }
 }
 
@@ -287,6 +375,12 @@ const mapDispatchToProps = (dispatch)=>{
     },
     removeQuiz: (id) => {
       dispatch(removeQuiz(id))
+    },
+    showQuizzes: () => {
+      dispatch(showQuizzes())
+    },
+    selectQuiz: (id) => {
+      dispatch(selectQuiz(id))
     }
   }
 }
@@ -295,6 +389,8 @@ const mapDispatchToProps = (dispatch)=>{
 const ConnectedQuiz = connect(mapStateToProps, mapDispatchToProps)(Quiz);
 //connect Question component to store
 const ConnectedQuestion = connect(mapStateToProps, mapDispatchToProps)(Question);
+//connect Student component to store 
+const ConnectedStudent = connect(mapStateToProps, mapDispatchToProps)(Student);
 
 //react-dom
 //wrap all App with Provider component for store accessibility
