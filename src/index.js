@@ -251,9 +251,7 @@ class Quiz extends React.Component{
   removeQuiz(id){
     this.props.removeQuiz(id);
     //remove questions that have removen quiz's id
-    this.props.questions.filter(question=>question.quiz_id == id).map(question=>{
-      this.props.removeQuestion(question.id);
-    });
+    this.props.questions.filter(question=>question.quiz_id == id).map(question=>this.props.removeQuestion(question.id));
     
     this.setState({
       ...this.state
@@ -289,11 +287,16 @@ class Student extends React.Component{
     super(props);
 
     this.state = {
-      selectedQuiz: null
+      selectedQuiz: null,
+      studentAnswers: [],
+      score: 0,
+      percentage : null,
+      totalAnswer: 0
     }
 
     this.showQuizzes = this.showQuizzes.bind(this);
     this.selectQuiz = this.selectQuiz.bind(this);
+    this.assessAnswers = this.assessAnswers.bind(this);
   }
 
   showQuizzes(){
@@ -309,6 +312,35 @@ class Student extends React.Component{
     this.setState({
       ...this.state
     })
+  }
+
+  assessAnswers(e){
+    let answers = [];
+    let results = [];
+    let studentScore = 0;
+    let studentPercentage = null;
+    this.props.questions.filter(question=>question.quiz_id===this.props.selectedQuiz.id).forEach(question=>{
+      let answerId = "answer_"+question.id;
+      answers.push(document.getElementById(answerId).value);
+      if(answers[question.id] === question.answer){
+        results.push(true);
+        studentScore++;
+
+      }else{
+        results.push(false);
+
+      }
+    
+    let totalAnswer = answers.length
+    studentPercentage = studentScore / totalAnswer * 100;
+
+    this.setState({
+      ...this.state,
+      score : studentScore,
+      percentage : studentPercentage,
+      totalAnswer
+    });
+    });
   }
 
   render(){
@@ -328,11 +360,23 @@ class Student extends React.Component{
         </select>
         <hr />
         <h3>{this.props.selectedQuiz.name}</h3>
-        <ul>
           {
-            this.props.questions.filter(question=>question.quiz_id===this.props.selectedQuiz.id).map(question=><li>{question.question}</li>)
+            this.props.questions.filter(question=>question.quiz_id===this.props.selectedQuiz.id).map((question, idx)=>
+            {
+            let answerId = 'answer_'+idx
+            return (
+            <div className="card mt-3">
+              <div className="card-header"><strong>Question {idx+1}</strong></div>
+              <div className="card-body">{question.question}</div>
+              <div className="card-footer btn-group">
+                <label className="mr-2">Your answer: </label><input id={answerId} type="text" />
+              </div>
+            </div>)
+            })
           }
-        </ul>
+
+          <button className="btn btn-success" onClick={this.assessAnswers}>Submit Your Answers</button>
+          <h3>Result: {this.state.score} right answer of {this.state.totalAnswer} questions. {Math.ceil(this.state.percentage)}%</h3>
       </div>
     );
 
